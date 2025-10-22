@@ -221,6 +221,13 @@ def espn_bot(function):
 
 if __name__ == '__main__':
     from gamedaybot.espn.scheduler import scheduler
+    from gamedaybot.espn.espn_bot import espn_bot
 
-    espn_bot("init")
+    bot = espn_bot("init")
+
+    # 🧪 TEMP TEST: Force standings post immediately
+    bot.send_standings_report()
+
+    # normal scheduler resumes afterward
     scheduler()
+
