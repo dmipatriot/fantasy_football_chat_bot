@@ -42,7 +42,7 @@ def scheduler():
                   day_of_week='tue', hour=7, minute=30, start_date=ff_start_date, end_date=ff_end_date,
                   timezone=my_timezone, replace_existing=True)
     sched.add_job(espn_bot, 'cron', ['get_standings'], id='standings',
-                  day_of_week='wed', hour=18, minute=40, start_date=ff_start_date, end_date=ff_end_date,
+                  day_of_week='wed', hour=7, minute=30, start_date=ff_start_date, end_date=ff_end_date,
                   timezone=my_timezone, replace_existing=True)
     sched.add_job(espn_bot, 'cron', ['get_waiver_report'], id='waiver_report',
                   day_of_week='wed', hour=7, minute=31, start_date=ff_start_date, end_date=ff_end_date,
