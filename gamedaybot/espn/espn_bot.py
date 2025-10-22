@@ -221,14 +221,6 @@ def espn_bot(function):
 
 if __name__ == '__main__':
     from gamedaybot.espn.scheduler import scheduler
-    from gamedaybot.espn.espn_bot import ESPN_BOT   # import the actual bot class
 
-    bot = ESPN_BOT()          # create a real instance
-
-    # 🧪 TEMP TEST — send standings now
-    bot.send_standings_report()
-
-    # continue with regular schedule
+    espn_bot("init")
     scheduler()
-
-
