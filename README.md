@@ -237,6 +237,29 @@ pip install -r requirements.txt
 |ESPN_S2|String|For Private leagues|None|Used for private leagues. See [Private Leagues Section](#private-leagues) for documentation|
 |SWID|String|For Private leagues|None|Used for private leagues. (Can be defined with or without {}) See [Private Leagues Section](#private-leagues) for documentation|
 
+#### Discord channel overrides
+
+If you would like specific reports to post to dedicated Discord channels, provide the corresponding optional webhook variables below. Any report without an override falls back to `DISCORD_WEBHOOK_URL`.
+
+|Var|Report Target|
+|---|-------------|
+|DISCORD_WEBHOOK_URL_MATCHUPS|`get_matchups`|
+|DISCORD_WEBHOOK_URL_MONITOR|`get_monitor`|
+|DISCORD_WEBHOOK_URL_SCOREBOARD|`get_scoreboard_short`|
+|DISCORD_WEBHOOK_URL_PROJECTED_SCOREBOARD|`get_projected_scoreboard`|
+|DISCORD_WEBHOOK_URL_CLOSE_SCORES|`get_close_scores`|
+|DISCORD_WEBHOOK_URL_POWER_RANKINGS|`get_power_rankings`|
+|DISCORD_WEBHOOK_URL_TROPHIES|`get_trophies`|
+|DISCORD_WEBHOOK_URL_STANDINGS|`get_standings`|
+|DISCORD_WEBHOOK_URL_FINAL|`get_final`|
+|DISCORD_WEBHOOK_URL_WAIVER_REPORT|`get_waiver_report`|
+|DISCORD_WEBHOOK_URL_BROADCAST|`broadcast`|
+|DISCORD_WEBHOOK_URL_INIT|`init`|
+|DISCORD_WEBHOOK_URL_TROPHY_RECAP|`trophy_recap`|
+|DISCORD_WEBHOOK_URL_WIN_MATRIX|`win_matrix`|
+
+You can also use `DISCORD_WEBHOOK_URL_SCOREBOARD_SHORT` or `DISCORD_WEBHOOK_URL_GET_SCOREBOARD_SHORT` as aliases for the scoreboard row.
+
 ### Running with Docker
 
 Use BOT_ID if using Groupme, DISCORD_WEBHOOK_URL if using Discord, and SLACK_WEBHOOK_URL if using Slack (or multiple to get messages in multiple places)
