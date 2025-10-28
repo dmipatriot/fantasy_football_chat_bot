@@ -1,3 +1,4 @@
+import json
 import os
 import gamedaybot.espn.functionality as espn
 import gamedaybot.utils.util as utils
@@ -53,15 +54,42 @@ def get_env_vars():
     except KeyError:
         slack_webhook_url = 1
 
+    discord_webhook_urls = {}
     try:
         discord_webhook_url = os.environ["DISCORD_WEBHOOK_URL"]
         str_limit = 3000
     except KeyError:
         discord_webhook_url = 1
 
+    discord_webhook_urls_raw = os.environ.get("DISCORD_WEBHOOK_URLS", "").strip()
+    if discord_webhook_urls_raw:
+        try:
+            parsed_urls = json.loads(discord_webhook_urls_raw)
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                "DISCORD_WEBHOOK_URLS must be a valid JSON object mapping report names to webhook URLs."
+            ) from exc
+
+        if not isinstance(parsed_urls, dict):
+            raise ValueError("DISCORD_WEBHOOK_URLS must decode to a JSON object (dictionary).")
+
+        discord_webhook_urls = {
+            str(key): str(value)
+            for key, value in parsed_urls.items()
+            if str(value).strip()
+        }
+
+        if discord_webhook_urls:
+            str_limit = 3000
+
+    has_discord_webhook = (
+        len(str(discord_webhook_url)) > 1 or
+        any(len(str(url)) > 1 for url in discord_webhook_urls.values())
+    )
+
     if (len(str(bot_id)) <= 1 and
         len(str(slack_webhook_url)) <= 1 and
-            len(str(discord_webhook_url)) <= 1):
+            not has_discord_webhook):
         # Ensure that there's info for at least one messaging platform,
         # use length of str in case of blank but non null env variable
         raise Exception("No messaging platform info provided. Be sure one of BOT_ID, SLACK_WEBHOOK_URL, or DISCORD_WEBHOOK_URL env variables are set")
@@ -70,6 +98,7 @@ def get_env_vars():
     data['bot_id'] = bot_id
     data['slack_webhook_url'] = slack_webhook_url
     data['discord_webhook_url'] = discord_webhook_url
+    data['discord_webhook_urls'] = discord_webhook_urls
 
     data['league_id'] = os.environ["LEAGUE_ID"]
 
