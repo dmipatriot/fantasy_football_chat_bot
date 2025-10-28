@@ -3,31 +3,6 @@ import gamedaybot.espn.functionality as espn
 import gamedaybot.utils.util as utils
 
 
-DISCORD_WEBHOOK_SUFFIXES = {
-    "broadcast": ("BROADCAST",),
-    "get_close_scores": ("CLOSE_SCORES", "GET_CLOSE_SCORES"),
-    "get_final": ("FINAL", "GET_FINAL"),
-    "get_matchups": ("MATCHUPS", "GET_MATCHUPS"),
-    "get_monitor": ("MONITOR", "GET_MONITOR"),
-    "get_power_rankings": ("POWER_RANKINGS", "GET_POWER_RANKINGS"),
-    "get_projected_scoreboard": (
-        "PROJECTED_SCOREBOARD",
-        "GET_PROJECTED_SCOREBOARD",
-    ),
-    "get_scoreboard_short": (
-        "SCOREBOARD",
-        "SCOREBOARD_SHORT",
-        "GET_SCOREBOARD_SHORT",
-    ),
-    "get_standings": ("STANDINGS", "GET_STANDINGS"),
-    "get_trophies": ("TROPHIES", "GET_TROPHIES"),
-    "get_waiver_report": ("WAIVER_REPORT", "GET_WAIVER_REPORT"),
-    "init": ("INIT",),
-    "trophy_recap": ("TROPHY_RECAP",),
-    "win_matrix": ("WIN_MATRIX",),
-}
-
-
 def get_env_vars():
     data = {}
     try:
@@ -84,15 +59,6 @@ def get_env_vars():
     except KeyError:
         discord_webhook_url = 1
 
-    discord_webhook_overrides = {}
-    for function_name, suffixes in DISCORD_WEBHOOK_SUFFIXES.items():
-        for suffix in suffixes:
-            env_var = f"DISCORD_WEBHOOK_URL_{suffix}"
-            override = os.environ.get(env_var)
-            if override:
-                discord_webhook_overrides[function_name] = override
-                break
-
     if (len(str(bot_id)) <= 1 and
         len(str(slack_webhook_url)) <= 1 and
             len(str(discord_webhook_url)) <= 1):
@@ -104,8 +70,6 @@ def get_env_vars():
     data['bot_id'] = bot_id
     data['slack_webhook_url'] = slack_webhook_url
     data['discord_webhook_url'] = discord_webhook_url
-    if discord_webhook_overrides:
-        data['discord_webhook_overrides'] = discord_webhook_overrides
 
     data['league_id'] = os.environ["LEAGUE_ID"]
 
