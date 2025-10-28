@@ -2,6 +2,50 @@ import requests
 import json
 import logging
 
+
+def _normalize_report_name(report_name):
+    if report_name is None:
+        return ""
+    return str(report_name).strip().lower()
+
+
+def get_webhook_for_report(report_name, default_webhook, report_webhooks=None):
+    """Return the webhook URL configured for a specific report type.
+
+    Parameters
+    ----------
+    report_name : str
+        The identifier for the report being sent (for example, a function name
+        like ``"get_power_rankings"``).
+    default_webhook : str
+        The default webhook URL to use when a specific report override is not
+        configured.
+    report_webhooks : Dict[str, str], optional
+        A dictionary mapping report identifiers to webhook URLs. Keys are
+        compared in a case-insensitive manner.
+
+    Returns
+    -------
+    str
+        The webhook URL that should receive the report. If no report-specific
+        webhook is configured, the ``default_webhook`` value is returned.
+    """
+
+    if not report_webhooks:
+        return default_webhook
+
+    normalized_report = _normalize_report_name(report_name)
+
+    for name, url in report_webhooks.items():
+        if _normalize_report_name(name) == normalized_report:
+            return url
+
+    # Allow for a catch-all channel via the key "default"
+    if "default" in report_webhooks:
+        return report_webhooks["default"]
+
+    return default_webhook
+
 logger = logging.getLogger(__name__)
 
 

@@ -4,7 +4,7 @@ if os.environ.get("AWS_EXECUTION_ENV") is not None:
     import utils.util as util
     from chat.groupme import GroupMe
     from chat.slack import Slack
-    from chat.discord import Discord
+    from chat.discord import Discord, get_webhook_for_report
 else:
     # For local use
     import sys
@@ -12,7 +12,7 @@ else:
     import gamedaybot.utils.util as util
     from gamedaybot.chat.groupme import GroupMe
     from gamedaybot.chat.slack import Slack
-    from gamedaybot.chat.discord import Discord
+    from gamedaybot.chat.discord import Discord, get_webhook_for_report
     from gamedaybot.espn.env_vars import get_env_vars
     import gamedaybot.espn.functionality as espn
     import gamedaybot.espn.season_recap as recap
@@ -95,14 +95,17 @@ def espn_bot(function):
     except KeyError:
         slack_webhook_url = 1
 
-    try:
-        discord_webhook_url = data['discord_webhook_url']
-    except KeyError:
-        discord_webhook_url = 1
+    discord_webhook_url = data.get('discord_webhook_url', 1)
+    discord_webhook_urls = data.get('discord_webhook_urls', {})
+
+    has_discord_webhook = (
+        len(str(discord_webhook_url)) > 1 or
+        any(len(str(url)) > 1 for url in discord_webhook_urls.values())
+    )
 
     if (len(str(bot_id)) <= 1 and
         len(str(slack_webhook_url)) <= 1 and
-            len(str(discord_webhook_url)) <= 1):
+            not has_discord_webhook):
         # Ensure that there's info for at least one messaging platform,
         # use length of str in case of blank but non null env variable
         raise Exception("No messaging platform info provided. Be sure one of BOT_ID, SLACK_WEBHOOK_URL, or DISCORD_WEBHOOK_URL env variables are set")
@@ -141,7 +144,8 @@ def espn_bot(function):
 
     groupme_bot = GroupMe(bot_id)
     slack_bot = Slack(slack_webhook_url)
-    discord_bot = Discord(discord_webhook_url)
+    # The Discord bot is initialised later once we know the destination webhook
+    # for the current report.
 
     if swid == '{1}' or espn_s2 == '1':
         league = League(league_id=league_id, year=year)
@@ -213,6 +217,13 @@ def espn_bot(function):
     if text != '':
         logger.debug(text)
         messages = util.str_limit_check(text, str_limit)
+        discord_destination = get_webhook_for_report(
+            function,
+            discord_webhook_url,
+            discord_webhook_urls
+        )
+        discord_bot = Discord(discord_destination)
+
         for message in messages:
             groupme_bot.send_message(message)
             slack_bot.send_message(message)
