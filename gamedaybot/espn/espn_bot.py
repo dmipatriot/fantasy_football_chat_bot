@@ -99,7 +99,6 @@ def espn_bot(function):
         discord_webhook_url = data['discord_webhook_url']
     except KeyError:
         discord_webhook_url = 1
-    discord_webhook_overrides = data.get('discord_webhook_overrides', {})
 
     if (len(str(bot_id)) <= 1 and
         len(str(slack_webhook_url)) <= 1 and
@@ -143,13 +142,6 @@ def espn_bot(function):
     groupme_bot = GroupMe(bot_id)
     slack_bot = Slack(slack_webhook_url)
     discord_bot = Discord(discord_webhook_url)
-    discord_clients = {discord_webhook_url: discord_bot}
-
-    def get_discord_client(target_function):
-        webhook_url = discord_webhook_overrides.get(target_function, discord_webhook_url)
-        if webhook_url not in discord_clients:
-            discord_clients[webhook_url] = Discord(webhook_url)
-        return discord_clients[webhook_url]
 
     if swid == '{1}' or espn_s2 == '1':
         league = League(league_id=league_id, year=year)
@@ -224,8 +216,7 @@ def espn_bot(function):
         for message in messages:
             groupme_bot.send_message(message)
             slack_bot.send_message(message)
-            discord_client = get_discord_client(function)
-            discord_client.send_message(message)
+            discord_bot.send_message(message)
 
 
 if __name__ == '__main__':
